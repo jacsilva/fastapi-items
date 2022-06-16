@@ -2,7 +2,7 @@ from typing import Union
 
 from fastapi import FastAPI, HTTPException, status
 from fastapi.params import Body
-from models import CreateItems
+from app.models.createitem import CreateItems
 from random import randrange
 
 app = FastAPI()
