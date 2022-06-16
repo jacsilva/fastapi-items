@@ -1,6 +1,6 @@
 from typing import Union
 
-from fastapi import FastAPI, HTTPException, status
+from fastapi import FastAPI, Response, HTTPException, status
 from fastapi.params import Body
 from app.models.createitem import CreateItems
 from random import randrange
@@ -19,9 +19,22 @@ def read_root():
     return {"Hello": "World"}
 
 
-# request method POST items
-@app.post("/createitems", status_code=status.HTTP_201_CREATED)
-def create_items(new_item: CreateItems):
+# request method GET list items
+@app.get("/items")
+def list_items():
+    return {"data": my_items}
+
+
+# request method GET latest item
+@app.get("/items/latest")
+def get_latest_item():
+    item = my_items[len(my_items)-1]
+    return {"detail": item}
+
+
+# request method POST create items
+@app.post("/items", status_code=status.HTTP_201_CREATED)
+def create_item(new_item: CreateItems):
     # print(new_item.dict())
     item_dict = new_item.dict()
     item_dict['id'] = randrange(0, 1000000)
@@ -29,41 +42,57 @@ def create_items(new_item: CreateItems):
     return {"new_item": f"Novo item criado: {item_dict['title'], item_dict['id']}"}
 
 
-# request method GET items
-@app.get("/items")
-def get_items():
-    return {"data": my_items}
-
-
-# request latest item
-@app.get("/items/latest")
-def get_latest_item():
-    item = my_items[len(my_items)-1]
-    return {"detail": item}
-
-
+# request method GET read item ID
 def find_item(id):
     for it in my_items:
         if it['id'] == id:
             return it
 
 
-# request method GET item ID
 @app.get("/items/{id}")
-def get_item(id: int):
+def read_item(id: int):
     item = find_item(id)
     if not item:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
-                            detail=f"Item com id: {id} não encontrado.")
+                            detail=f"Item com id: {id} não existe.")
     return {"item_detail": item}
 
-
+    
 # request method GET item ID
-@app.get("/items/{item_id}")
-def read_item(item_id: int, q: Union[str, None] = None):
-    return {"item_id": item_id, "q": q}
+# @app.get("/items/{item_id}")
+# def read_item(item_id: int, q: Union[str, None] = None):
+#     return {"item_id": item_id, "q": q}
 
 
-# request method PUT item ID
+# request method PUT update item ID
+@app.put('/items/{id}')
+def update_item(id: int, item: CreateItems):
+    index = find_index_item(id)
 
-# request method DELETE item ID
+    if index == None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                            detail=f"Item com id: {id} não existe.")
+    
+    item_dict = item.dict()
+    item_dict['id'] = id
+    my_items[index] = item_dict
+
+    return {'data': item_dict}
+
+
+# request method DELETE delete item ID
+def find_index_item(id):
+    for i, t in enumerate(my_items):
+        if t['id'] == id:
+            return i
+
+@app.delete("/items/{id}")
+def delete_item(id: int):
+    index = find_index_item(id)
+    if index == None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                            detail=f"Item com id: {id} não existe.")
+    my_items.pop(index)
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+
