@@ -1,6 +1,6 @@
 from typing import Union
 
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException, status
 from fastapi.params import Body
 from models import CreateItems
 from random import randrange
@@ -20,7 +20,7 @@ def read_root():
 
 
 # request method POST items
-@app.post("/createitems")
+@app.post("/createitems", status_code=status.HTTP_201_CREATED)
 def create_items(new_item: CreateItems):
     # print(new_item.dict())
     item_dict = new_item.dict()
@@ -35,17 +35,27 @@ def get_items():
     return {"data": my_items}
 
 
+# request latest item
+@app.get("/items/latest")
+def get_latest_item():
+    item = my_items[len(my_items)-1]
+    return {"detail": item}
+
+
 def find_item(id):
     for it in my_items:
         if it['id'] == id:
             return it
 
-            
+
 # request method GET item ID
 @app.get("/items/{id}")
-def get_item(id):
-    item = find_item(int(id))
-    return {"item_detail": item }
+def get_item(id: int):
+    item = find_item(id)
+    if not item:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                            detail=f"Item com id: {id} não encontrado.")
+    return {"item_detail": item}
 
 
 # request method GET item ID
