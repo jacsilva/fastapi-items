@@ -2,8 +2,18 @@ from typing import Union
 
 from fastapi import FastAPI
 from fastapi.params import Body
+from pydantic import BaseModel
+from typing import Optional
 
 app = FastAPI()
+
+
+
+class CreateItems(BaseModel):
+    title: str
+    content: str
+    published: bool = True
+    rating: Optional[int] = None
 
 
 @app.get("/")
@@ -17,6 +27,6 @@ def read_item(item_id: int, q: Union[str, None] = None):
 
 
 @app.post("/createitems")
-def create_items(payload: dict = Body(...)):
-    print(payload)
-    return {"new_item": f"Novo item criado: {payload['title']}"}
+def create_items(new_item: CreateItems):
+    print(new_item)
+    return {"new_item": f"Novo item criado: {new_item.title}"}
