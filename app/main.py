@@ -1,11 +1,23 @@
 from typing import Union
 
-from fastapi import FastAPI, Response, HTTPException, status
+from fastapi import FastAPI, Response, HTTPException, status, Depends
 from fastapi.params import Body
-from app.models.createitem import CreateItems
+# from app.models.createitem import CreateItems
 from random import randrange
 
+from . import config
+
+from .models import docsModel
+from .database import engine, get_db
+from sqlalchemy.orm import Session
+
+docsModel.Base.metadata.create_all(bind=engine)
+
+
 app = FastAPI()
+
+
+
 
 my_items = [
     {'id': 1, 'title': 'django, o filme', 'content': 'conteúdo django', 'published': True, 'rating': 2},
@@ -13,10 +25,21 @@ my_items = [
 ]
 
 
+@app.get("/info")
+async def info(settings = Depends(config.get_settings)):
+    return {
+        "app_name": settings.app_name,
+        "admin_email": settings.database_string,
+    }
 
 @app.get("/")
 def read_root():
     return {"Hello": "World"}
+
+
+@app.get("/posts/")
+def test_posts(db: Session = Depends(get_db)):
+    return {"status": "success"}
 
 
 # request method GET list items
@@ -33,13 +56,13 @@ def get_latest_item():
 
 
 # request method POST create items
-@app.post("/items", status_code=status.HTTP_201_CREATED)
-def create_item(new_item: CreateItems):
-    # print(new_item.dict())
-    item_dict = new_item.dict()
-    item_dict['id'] = randrange(0, 1000000)
-    my_items.append(item_dict)
-    return {"new_item": f"Novo item criado: {item_dict['title'], item_dict['id']}"}
+# @app.post("/items", status_code=status.HTTP_201_CREATED)
+# def create_item(new_item: CreateItems):
+#     # print(new_item.dict())
+#     item_dict = new_item.dict()
+#     item_dict['id'] = randrange(0, 1000000)
+#     my_items.append(item_dict)
+#     return {"new_item": f"Novo item criado: {item_dict['title'], item_dict['id']}"}
 
 
 # request method GET read item ID
@@ -66,18 +89,18 @@ def read_item(id: int):
 
 # request method PUT update item ID
 @app.put('/items/{id}')
-def update_item(id: int, item: CreateItems):
-    index = find_index_item(id)
+# def update_item(id: int, item: CreateItems):
+#     index = find_index_item(id)
 
-    if index == None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
-                            detail=f"Item com id: {id} não existe.")
+#     if index == None:
+#         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+#                             detail=f"Item com id: {id} não existe.")
     
-    item_dict = item.dict()
-    item_dict['id'] = id
-    my_items[index] = item_dict
+#     item_dict = item.dict()
+#     item_dict['id'] = id
+#     my_items[index] = item_dict
 
-    return {'data': item_dict}
+#     return {'data': item_dict}
 
 
 # request method DELETE delete item ID

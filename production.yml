@@ -1,0 +1,39 @@
+version: '3'
+
+volumes:
+  production_postgres_data: {}
+  production_postgres_data_backups: {}
+
+services:
+  postgres:
+    build:
+      context: .
+      dockerfile: ./compose/production/postgres/Dockerfile
+    image: docsadm-postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - production_postgres_data:/var/lib/postgresql/data
+      - production_postgres_data_backups:/backups
+    env_file:
+      - ./.envs/.production/.postgres
+    container_name: docsadm_psql
+    restart: unless-stopped
+
+  webserver:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: webserver
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    networks:
+      - app-network
+    depends_on:
+      - postgres
+
+  
+networks:
+  app-network:
+    driver: bridge

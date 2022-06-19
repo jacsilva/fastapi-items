@@ -1,0 +1,9 @@
+export POSTGRES_HOST=10.0.52.89
+export POSTGRES_PORT=5432
+export POSTGRES_DB=sinfordb 
+export POSTGRES_USER=DtS28Hbfac
+export POSTGRES_PASSWORD=qlS8mYmDUnsKXJflZDM7FouCLDWYpEiV
+export DATABASE_URL="postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}"
+
+export ADMIN_EMAIL="deadpool@example.com"
+export APP_NAME="ChimichangApp"
