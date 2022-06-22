@@ -2,21 +2,17 @@ from typing import Union
 
 from fastapi import FastAPI, Response, HTTPException, status, Depends
 from fastapi.params import Body
-# from app.models.createitem import CreateItems
 from random import randrange
-
-from . import config
-
-from .models import docsModel
-from .database import engine, get_db
 from sqlalchemy.orm import Session
 
-docsModel.Base.metadata.create_all(bind=engine)
+from . import config, schemas, models, crud
+
+from .database import engine, get_db
+
+models.Base.metadata.create_all(bind=engine)
 
 
 app = FastAPI()
-
-
 
 
 my_items = [
@@ -26,7 +22,7 @@ my_items = [
 
 
 @app.get("/info")
-async def info(settings = Depends(config.get_settings)):
+async def get_info(settings = Depends(config.get_settings)):
     return {
         "app_name": settings.app_name,
         "admin_email": settings.database_string,
@@ -37,15 +33,11 @@ def read_root():
     return {"Hello": "World"}
 
 
-@app.get("/posts/")
-def test_posts(db: Session = Depends(get_db)):
-    return {"status": "success"}
-
-
 # request method GET list items
 @app.get("/items")
-def list_items():
-    return {"data": my_items}
+def list_items(db: Session = Depends(get_db), skip: int = 0, limit: int = 10,):
+    docs = crud.get_items(db, skip=skip, limit=limit)
+    return {"data": docs}
 
 
 # request method GET latest item
@@ -56,13 +48,15 @@ def get_latest_item():
 
 
 # request method POST create items
-# @app.post("/items", status_code=status.HTTP_201_CREATED)
-# def create_item(new_item: CreateItems):
-#     # print(new_item.dict())
-#     item_dict = new_item.dict()
-#     item_dict['id'] = randrange(0, 1000000)
-#     my_items.append(item_dict)
-#     return {"new_item": f"Novo item criado: {item_dict['title'], item_dict['id']}"}
+@app.post("/items", status_code=status.HTTP_201_CREATED)
+def create_item(item: schemas.CreateItems, db: Session = Depends(get_db)):
+    db_item = crud.get_item_by_title(db, title=item.title)
+    if db_item:
+        raise HTTPException(status_code=400, detail=f"Item com o título '{item.title}' já existe!")
+
+    db_item = crud.create_item(db, item)
+    return {"data": db_item}
+    # return {"new_item": f"Novo item criado: {item_dict['title'], item_dict['id']}"}
 
 
 # request method GET read item ID
@@ -80,27 +74,21 @@ def read_item(id: int):
                             detail=f"Item com id: {id} não existe.")
     return {"item_detail": item}
 
-    
-# request method GET item ID
-# @app.get("/items/{item_id}")
-# def read_item(item_id: int, q: Union[str, None] = None):
-#     return {"item_id": item_id, "q": q}
-
 
 # request method PUT update item ID
 @app.put('/items/{id}')
-# def update_item(id: int, item: CreateItems):
-#     index = find_index_item(id)
+def update_item(id: int, item: schemas.CreateItems):
+    index = find_index_item(id)
 
-#     if index == None:
-#         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
-#                             detail=f"Item com id: {id} não existe.")
+    if index == None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                            detail=f"Item com id: {id} não existe.")
     
-#     item_dict = item.dict()
-#     item_dict['id'] = id
-#     my_items[index] = item_dict
+    item_dict = item.dict()
+    item_dict['id'] = id
+    my_items[index] = item_dict
 
-#     return {'data': item_dict}
+    return {'data': item_dict}
 
 
 # request method DELETE delete item ID
