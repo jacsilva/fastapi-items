@@ -28,7 +28,7 @@ class DocsModelAdm(Base):
     title = Column(String, nullable=False)
     content = Column(String, nullable=False)
     status = Column(
-            ChoiceType({"RECEBIDO": "RECEBIDO", "ENCAMINHADO": "ENCAMINHADO", "EM EXECUÇÃO": "EM EXECUÇÃO", "EM ENCERRADO": "EM ENCERRADO"}), nullable=True
+            ChoiceType({"1": "RECEBIDO", "2": "ENCAMINHADO", "3": "EM EXECUÇÃO", "4": "ENCERRADO"}), nullable=True
         )
     group_id = Column(Integer, ForeignKey("docsgroup.id"), nullable=True)
     created_at = Column(TIMESTAMP(timezone=True), nullable=False, server_default=text('now()'))
