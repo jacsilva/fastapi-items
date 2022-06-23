@@ -50,7 +50,7 @@ def get_latest_item():
 # request method POST create items
 @app.post("/items", status_code=status.HTTP_201_CREATED)
 def create_item(item: schemas.CreateItems, db: Session = Depends(get_db)):
-    db_item = crud.get_item_by_title(db, title=item.title)
+    db_item = crud.get_item_by_title(models=models.DocsModelAdm, db=db, title=item.title)
     if db_item:
         raise HTTPException(status_code=400, detail=f"Item com o título '{item.title}' já existe!")
 
@@ -59,51 +59,49 @@ def create_item(item: schemas.CreateItems, db: Session = Depends(get_db)):
     # return {"new_item": f"Novo item criado: {item_dict['title'], item_dict['id']}"}
 
 
+@app.post("/groups", status_code=status.HTTP_201_CREATED)
+def create_group(item: schemas.CreateGroups, db: Session = Depends(get_db)):
+    db_group = crud.get_item_by_title(models=models.DocsModelGroup, db=db, title=item.title)
+    if db_group:
+        raise HTTPException(status_code=400, detail=f"Grupo com o nome '{item.title}' já existe!")
+
+    db_group = crud.create_group(db, item) 
+    return {"data": db_group}
+ 
+ 
 # request method GET read item ID
-def find_item(id):
-    for it in my_items:
-        if it['id'] == id:
-            return it
-
-
 @app.get("/items/{id}")
-def read_item(id: int):
-    item = find_item(id)
-    if not item:
+def read_item(id: int, db: Session = Depends(get_db)):
+    db_item = crud.get_item_by_id(models=models.DocsModelAdm, db=db, id=id)
+   
+    if not db_item:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail=f"Item com id: {id} não existe.")
-    return {"item_detail": item}
+    return {"item_detail": db_item}
 
 
 # request method PUT update item ID
 @app.put('/items/{id}')
-def update_item(id: int, item: schemas.CreateItems):
-    index = find_index_item(id)
+def update_item(id: int, updated_item: schemas.CreateItems, db: Session = Depends(get_db)):
+    db_item = crud.get_item_for_delete_or_update(models=models.DocsModelAdm, db=db, id=id)
 
-    if index == None:
+    if db_item.first() == None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail=f"Item com id: {id} não existe.")
+    db_item = crud.update_item(db_item, db, updated_item)
     
-    item_dict = item.dict()
-    item_dict['id'] = id
-    my_items[index] = item_dict
-
-    return {'data': item_dict}
+    return {'data': db_item}
 
 
 # request method DELETE delete item ID
-def find_index_item(id):
-    for i, t in enumerate(my_items):
-        if t['id'] == id:
-            return i
-
 @app.delete("/items/{id}")
-def delete_item(id: int):
-    index = find_index_item(id)
-    if index == None:
+def delete_item(id: int, db: Session = Depends(get_db)):
+    db_item = crud.get_item_for_delete_or_update(models=models.DocsModelAdm, db=db, id=id)
+    if db_item.first() == None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail=f"Item com id: {id} não existe.")
-    my_items.pop(index)
+    db_item = crud.delete_item(db_item, db)
+
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 

@@ -31,6 +31,6 @@ class DocsModelGroup(Base):
     __tablename__ = "docsgroup"
 
     id = Column(Integer, primary_key=True, nullable=False)
-    name = Column(String, nullable=False)
-
+    title = Column(String, nullable=False)
+ 
 

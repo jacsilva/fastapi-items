@@ -12,10 +12,15 @@ class CreateItems(BaseModel):
     # id: int
     title: str
     content: str
-    # status = str
-    # group_id = int
+    status = str
+    group_id = int
 
     class Config:
         orm_mode = True
 
- 
+
+class CreateGroups(BaseModel):
+    title: str 
+
+    class Config:
+        orm_mode = True
