@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from . import models, schemas
 
 
-def get_items(db: Session, skip: int = 0, limit: int = 10):
+def get_items_all(db: Session, skip: int = 0, limit: int = 10):
     return db.query(models.DocsModelAdm).offset(skip).limit(limit).all()
 
 

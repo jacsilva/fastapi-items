@@ -1,15 +1,22 @@
 #!/usr/bin/python
 
 from pydantic import BaseModel
-from typing import Optional
-import psycopg2
-from psycopg2.extras import RealDictCursor
-import time
-from app import config
-from fastapi import Depends
+from datetime import datetime 
 
-class CreateItems(BaseModel):
-    # id: int
+
+class Item(BaseModel):
+    id: int
+    title: str
+    content: str
+    status = str
+    group_id = int
+    created_at: datetime
+    
+    class Config:
+        orm_mode = True
+
+        
+class ItemBase(BaseModel):
     title: str
     content: str
     status = str
@@ -19,8 +26,21 @@ class CreateItems(BaseModel):
         orm_mode = True
 
 
-class CreateGroups(BaseModel):
+class CreateItems(ItemBase):
+    pass
+
+
+class UpdateItems(ItemBase):
+    pass
+
+
+class GroupBase(BaseModel):
     title: str 
 
     class Config:
         orm_mode = True
+
+
+class CreateGroups(GroupBase):
+    pass
+
