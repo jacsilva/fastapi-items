@@ -39,20 +39,6 @@ class DocsModelAdm(Base):
     group = relationship("DocsModelGroup", back_populates="items")
 
 
-
-class Parent(Base):
-    __tablename__ = "parent"
-    id = Column(Integer, primary_key=True)
-    children = relationship("Child", back_populates="parent")
-
-
-class Child(Base):
-    __tablename__ = "child"
-    id = Column(Integer, primary_key=True)
-    parent_id = Column(Integer, ForeignKey("parent.id"))
-    parent = relationship("Parent", back_populates="children")
-
-
     
 
 class User(Base):

@@ -4,7 +4,7 @@ from typing import List
 from sqlalchemy.orm import Session
 
 from ..models import docs_model
-from ..schemas import docs_schema
+from ..schemas import groups_schemas
 
 from ..database import engine, get_db
 from .. import crud
@@ -24,17 +24,19 @@ router = APIRouter(
 
 # request method POST create groups
 @router.post("/", status_code=status.HTTP_201_CREATED)
-def create_group(item: docs_schema.CreateGroups, db: Session = Depends(get_db)):
-    db_group = crud.get_item_by_title(model=docs_model.DocsModelGroup, db=db, title=item.title)
+def create_group(schema: groups_schemas.CreateGroups, db: Session = Depends(get_db)):
+    model=docs_model.DocsModelGroup
+    db_group = crud.get_item_by_title(model=model, db=db, title=schema.title)
     if db_group:
-        raise HTTPException(status_code=400, detail=f"Grupo com o nome '{item.title}' já existe!")
+        raise HTTPException(status_code=400, detail=f"Grupo com o nome '{schema.title}' já existe!")
 
-    db_group = crud.create_group(db, item) 
+    # db_group = crud.create_group(db, item) 
+    db_group = crud.create(db=db, model=model, schema=schema)
     return {"data": db_group}
 
 
 # request method GET list groups
-@router.get("/", response_model=List[docs_schema.Group])
+@router.get("/", response_model=List[groups_schemas.Group])
 def list_items(db: Session = Depends(get_db), skip: int = 0, limit: int = 10,):
     docs = crud.get_items_all(docs_model.DocsModelGroup, db, skip=skip, limit=limit)
     return docs
