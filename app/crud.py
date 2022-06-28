@@ -8,8 +8,9 @@ def get_items_all(model, db: Session, skip: int = 0, limit: int = 10):
     return db.query(model).offset(skip).limit(limit).all()
 
 
-def create_item(db: Session, item: docs_schema.CreateItems, id_group: int):
-    db_docs = docs_model.DocsModelAdm(**item.dict(), group_id=id_group)
+def create_item(db: Session, item: docs_schema.CreateItems):
+    db_docs = docs_model.DocsModelAdm(**item.dict())
+    # db_docs = docs_model.DocsModelAdm(**item.dict(), group_id=item.group_id)
     db.add(db_docs)
     db.commit()
     db.refresh(db_docs)

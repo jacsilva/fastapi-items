@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-from typing import List
+from typing import List, Dict
 from pydantic import BaseModel
 from datetime import datetime 
 
@@ -8,10 +8,13 @@ from datetime import datetime
 class ItemBase(BaseModel):
     title: str
     content: str
-    status = int
-    group_id = int
+    # status: str
+    # status: dict = None
+    # dict_str_float: Dict[str, int] = None
 
+    group_id: int = None
 
+ 
 # response_model
 class Item(ItemBase):
     id: int

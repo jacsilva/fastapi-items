@@ -22,14 +22,14 @@ router = APIRouter(
 #------------   C   R   U   D  : Items   ---------------------#
 
 # request method POST create items
-@router.post("/{group_id}/items", status_code=status.HTTP_201_CREATED, response_model=docs_schema.Item)
-def create_item(group_id: int, item: docs_schema.CreateItems, db: Session = Depends(get_db)):
+@router.post("/", status_code=status.HTTP_201_CREATED, response_model=docs_schema.Item)
+def create_item(item: docs_schema.CreateItems, db: Session = Depends(get_db)):
     db_item = crud.get_item_by_title(model=docs_model.DocsModelAdm, db=db, title=item.title)
-    print(group_id)
+    
     if db_item:
         raise HTTPException(status_code=400, detail=f"Item com o título '{item.title}' já existe!")
 
-    return crud.create_item(db, item, id_group=group_id)
+    return crud.create_item(db, item)
   
   
 # request method GET read item ID
