@@ -41,8 +41,8 @@ def get_item_for_delete_or_update(model, db: Session, id: int):
 
 def verify_if_user_exist(model, db: Session, schema):
     username = db.query(model).filter(model.username == schema.username).first()
-    password = db.query(model).filter(model.password == schema.password).first()
-    if username or password:
+    email = db.query(model).filter(model.email == schema.email).first()
+    if username or email:
         return True
     else:
         return False

@@ -1,13 +1,13 @@
 #!/usr/bin/python
 
 from typing import List, Dict
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr
 from datetime import datetime 
 
 
 class UserBase(BaseModel):
     username: str
-    email: str
+    email: EmailStr
 
  
 class UserCreate(UserBase):

@@ -2,13 +2,13 @@ from fastapi import FastAPI, Depends
 
 from . import config
 
-from .routers import docs, groups, users
+from .routers import groups, docs, users
 
 
 app = FastAPI()
 
-app.include_router(docs.router)
 app.include_router(groups.router)
+app.include_router(docs.router)
 app.include_router(users.router)
 
 
