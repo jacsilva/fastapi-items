@@ -3,7 +3,7 @@
 from typing import List, Dict
 from pydantic import BaseModel
 from datetime import datetime 
-from .items_schemas import Item
+from .docs_schemas import Item
 
 class GroupBase(BaseModel):
     title: str 

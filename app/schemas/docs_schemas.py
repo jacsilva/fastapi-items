@@ -11,7 +11,7 @@ class ItemBase(BaseModel):
     
  
 # response_model
-class Item(ItemBase):
+class Item(ItemBase): 
     id: int
     created_at: datetime
     

@@ -8,15 +8,6 @@ from sqlalchemy.orm import relationship
 from app.database import Base
 
 
-class DocsModelGroup(Base):
-    __tablename__ = "docsgroup"
-
-    id = Column(Integer, primary_key=True, nullable=False)
-    title = Column(String, nullable=False)
-
-    items = relationship("DocsModelAdm", back_populates="group")
-
-
 class DocsModelAdm(Base):
     __tablename__ = "docsadm"
 

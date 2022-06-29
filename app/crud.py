@@ -1,38 +1,17 @@
 from sqlalchemy.orm import Session
 
-# from .models import docs_model
-# from .schemas import items_schemas, groups_schemas
 
 
 def get_items_all(model, db: Session, skip: int = 0, limit: int = 10):
     return db.query(model).offset(skip).limit(limit).all()
 
 
-# def create_item(db: Session, item: items_schemas.CreateItems):
-#     db_docs = docs_model.DocsModelAdm(**item.dict())
-#     # db_docs = docs_model.DocsModelAdm(**item.dict(), group_id=item.group_id)
-#     db.add(db_docs)
-#     db.commit()
-#     db.refresh(db_docs) 
-#     return db_docs
-
-def create(db: Session, model, schema):
+def create_item(db: Session, model, schema):
     db_docs = model(**schema.dict())
-    # db_docs = docs_model.DocsModelAdm(**item.dict(), group_id=item.group_id)
     db.add(db_docs)
     db.commit()
     db.refresh(db_docs) 
     return db_docs
-
-
-# def create_group(db: Session, item: groups_schemas.CreateGroups):
-#     db_groups = docs_model.DocsModelGroup(
-#         title = item.title
-#     )
-#     db.add(db_groups)
-#     db.commit()
-#     db.refresh(db_groups)
-#     return db_groups
 
 
 def delete_item(db_item, db: Session):

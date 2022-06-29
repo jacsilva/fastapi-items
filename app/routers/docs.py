@@ -4,7 +4,7 @@ from typing import List
 from sqlalchemy.orm import Session
 
 from ..models import docs_model
-from ..schemas import items_schemas
+from ..schemas import docs_schemas
 
 from ..database import engine, get_db
 from .. import crud
@@ -22,15 +22,15 @@ router = APIRouter(
 #------------   C   R   U   D  : Items   ---------------------#
 
 # request method POST create items
-@router.post("/", status_code=status.HTTP_201_CREATED, response_model=items_schemas.Item)
-def create_item(schema: items_schemas.CreateItems, db: Session = Depends(get_db)):
+@router.post("/", status_code=status.HTTP_201_CREATED, response_model=docs_schemas.Item)
+def create_item(schema: docs_schemas.CreateItems, db: Session = Depends(get_db)):
     model=docs_model.DocsModelAdm
     db_item = crud.get_item_by_title(model=model, db=db, title=schema.title)
     
     if db_item:
         raise HTTPException(status_code=400, detail=f"Item com o título '{schema.title}' já existe!")
 
-    return crud.create(db=db, model=model, schema=schema)
+    return crud.create_item(db=db, model=model, schema=schema)
     # return crud.create_item(db, item)
   
   
@@ -46,8 +46,8 @@ def read_item(id: int, db: Session = Depends(get_db)):
 
 
 # request method PUT update item ID
-@router.put('/{id}', response_model=items_schemas.Item)
-def update_item(id: int, updated_schemas: items_schemas.UpdateItems, db: Session = Depends(get_db)):
+@router.put('/{id}', response_model=docs_schemas.Item)
+def update_item(id: int, updated_schemas: docs_schemas.UpdateItems, db: Session = Depends(get_db)):
     db_item = crud.get_item_for_delete_or_update(model=docs_model.DocsModelAdm, db=db, id=id)
 
     if db_item.first() == None:
