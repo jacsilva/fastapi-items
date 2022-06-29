@@ -24,21 +24,12 @@ class DocsModelAdm(Base):
     status = Column(
             ChoiceType(STATUS_TYPES, impl=Integer()), nullable=True
         )
-    created_at = Column(TIMESTAMP(timezone=True), nullable=False, server_default=text('now()'))  
     group_id = Column(Integer, ForeignKey("docsgroup.id"), nullable=True)
+    created_at = Column(TIMESTAMP(timezone=True), nullable=False, server_default=text('now()'))  
 
     group = relationship("DocsModelGroup", back_populates="items")
 
 
-    
-
-class User(Base):
-    __tablename__="User"
-
-    id = Column(Integer, primary_key=True, index=True)
-    email = Column(String, unique=True, index=True)
-    hashed_password = Column(String)
-    is_active = Column(Boolean, default=True)
-
+  
     
 

@@ -39,3 +39,11 @@ def get_item_for_delete_or_update(model, db: Session, id: int):
     return db.query(model).filter(model.id == id)
 
 
+def verify_if_user_exist(model, db: Session, schema):
+    username = db.query(model).filter(model.username == schema.username).first()
+    password = db.query(model).filter(model.password == schema.password).first()
+    if username or password:
+        return True
+    else:
+        return False
+

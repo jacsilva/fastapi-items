@@ -11,6 +11,7 @@ class GroupBase(BaseModel):
 
 class Group(GroupBase):
     id: int 
+    created_at: datetime
     items: List[Item] = []
     
     class Config:
